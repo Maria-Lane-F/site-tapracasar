@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Administrador • TaPraCasar</title>
+    <style>
+        body {
+            background: #121212;
+            color: #ffffff;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(30, 30, 30, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+        .brand {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #777;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-size: 14px;
+            color: #4CAF50;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #aaaaaa;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+        .color-row {
+            display: flex;
+            gap: 15px;
+        }
+        .color-group {
+            flex: 1;
+        }
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #2a2a2a;
+            cursor: pointer;
+            padding: 2px;
+        }
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .radio-group label {
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: #dddddd;
+        }
+        #result_area {
+            margin-top: 25px;
+            padding: 15px;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            display: none;
+            word-break: break-all;
+            text-align: left;
+        }
+        #result_area p {
+            margin: 0 0 10px 0;
+            font-size: 13px;
+            color: #aaa;
+        }
+        #final_link {
+            color: #4CAF50;
+            font-size: 13px;
+            text-decoration: none;
+        }
+        #final_link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="brand">TaPraCasar • Painel Admin</div>
+        <h1>Configuração do Evento</h1>
+        
+        <div class="section-title">1. Informações da Página</div>
+        <div class="form-group">
+            <label>Título do Evento</label>
+            <input type="text" id="event_title" placeholder="Ex: Casamento Ana & Bruno" value="Casamento Ana & Bruno">
+        </div>
+        <div class="form-group">
+            <label>Subtítulo / Descrição</label>
+            <textarea id="event_desc" placeholder="Mensagem para os convidados...">Envie suas fotos favoritas da nossa celebração!</textarea>
+        </div>
+
+        <div class="section-title">2. Cores da Página</div>
+        <div class="color-row">
+            <div class="form-group color-group">
+                <label>Cor de Fundo</label>
+                <input type="color" id="bg_color" value="#121212">
+            </div>
+            <div class="form-group color-group">
+                <label>Cor do Título</label>
+                <input type="color" id="title_color" value="#ffffff">
+            </div>
+            <div class="form-group color-group">
+                <label>Cor do Texto</label>
+                <input type="color" id="text_color" value="#aaaaaa">
+            </div>
+        </div>
+
+        <div class="section-title">3. Destino das Fotos (Google Drive)</div>
+        <div class="radio-group">
+            <label><input type="radio" name="account_type" value="minha" checked onclick="toggleAccountType()"> Minha Conta (Gratuito/Teste)</label>
+            <label><input type="radio" name="account_type" value="cliente" onclick="toggleAccountType()"> Conta do Cliente (Whitelabel)</label>
+        </div>
+
+        <div id="minha_fields">
+            <div class="form-group">
+                <label>Link do Web App (Google Apps Script)</label>
+                <input type="text" id="my_script_url" placeholder="https://script.google.com/macros/s/AKfycbzj4VEpDRpDUvGLbehbmljxcxXTT8ASJnZ1X-AnIl5hJnCyI6vrpSeKO50OWPov-SPEyA/exec">
+            </div>
+            <div class="form-group">
+                <label>ID da Pasta do Google Drive</label>
+                <input type="text" id="folder_id" placeholder="ID que fica na URL da pasta do Drive">
+            </div>
+        </div>
+
+        <div id="client_fields" style="display: none;">
+            <div class="form-group">
+                <label>Link do Web App Exclusivo do Cliente</label>
+                <input type="text" id="client_script_url" placeholder="https://script.google.com/macros/s/.../exec">
+            </div>
+        </div>
+
+        <button onclick="generateLink()">Gerar Link Personalizado</button>
+
+        <div id="result_area">
+            <p><strong>Link gerado com sucesso! Copie ou abra abaixo:</strong></p>
+            <a id="final_link" href="#" target="_blank"></a>
+        </div>
+    </div>
+
+    <script>
+        function toggleAccountType() {
+            const type = document.querySelector('input[name="account_type"]:checked').value;
+            if (type === 'minha') {
+                document.getElementById('minha_fields').style.display = 'block';
+                document.getElementById('client_fields').style.display = 'none';
+            } else {
+                document.getElementById('minha_fields').style.display = 'none';
+                document.getElementById('client_fields').style.display = 'block';
+            }
+        }
+
+        function generateLink() {
+            const title = document.getElementById('event_title').value.trim();
+            const desc = document.getElementById('event_desc').value.trim();
+            const bgColor = document.getElementById('bg_color').value;
+            const titleColor = document.getElementById('title_color').value;
+            const textColor = document.getElementById('text_color').value;
+            
+            const type = document.querySelector('input[name="account_type"]:checked').value;
+            let scriptUrl = '';
+            let folderId = '';
+
+            let finalUrl = 'enviar.html';
+
+            if (type === 'minha') {
+                scriptUrl = document.getElementById('my_script_url').value.trim();
+                folderId = document.getElementById('folder_id').value.trim();
+                if (!scriptUrl || !folderId) {
+                    alert('Preencha o Link do seu Script e o ID da Pasta.');
+                    return;
+                }
+            } else {
+                scriptUrl = document.getElementById('client_script_url').value.trim();
+                if (!scriptUrl) {
+                    alert('Preencha o Link do Script do Cliente.');
+                    return;
+                }
+            }
+
+            finalUrl += `?title=${encodeURIComponent(title)}&desc=${encodeURIComponent(desc)}&bg=${encodeURIComponent(bgColor)}&tcol=${encodeURIComponent(titleColor)}&col=${encodeURIComponent(textColor)}&script=${btoa(scriptUrl)}`;
+            if (folderId) {
+                finalUrl += `&folder=${btoa(folderId)}`;
+            }
+
+            const linkElement = document.getElementById('final_link');
+            linkElement.href = finalUrl;
+            linkElement.innerText = "Abrir Página do Convidado Personalizada";
+            document.getElementById('result_area').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
