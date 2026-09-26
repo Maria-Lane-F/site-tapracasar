@@ -172,22 +172,16 @@
             <label><input type="radio" name="account_type" value="cliente" onclick="toggleAccountType()"> Conta do Cliente (Whitelabel)</label>
         </div>
 
-        <div id="minha_fields">
-            <div class="form-group">
-                <label>Link do Web App (Google Apps Script)</label>
-                <input type="text" id="my_script_url" placeholder="https://script.google.com/macros/s/.../exec">
-            </div>
-            <div class="form-group">
-                <label>ID da Pasta do Google Drive</label>
-                <input type="text" id="folder_id" placeholder="ID que fica na URL da pasta do Drive">
-            </div>
+        <!-- CAMPO COMPARTILHADO DE SCRIPT (Adapta o comportamento conforme a escolha) -->
+        <div class="form-group">
+            <label id="script_label">Link do Web App (Google Apps Script)</label>
+            <input type="text" id="script_url" placeholder="https://script.google.com/macros/s/.../exec">
         </div>
 
-        <div id="client_fields" style="display: none;">
-            <div class="form-group">
-                <label>Link do Web App Exclusivo do Cliente</label>
-                <input type="text" id="client_script_url" placeholder="https://script.google.com/macros/s/.../exec">
-            </div>
+        <!-- ID DA PASTA (Fica visível apenas na opção "Minha Conta") -->
+        <div class="form-group" id="folder_field_container">
+            <label>ID da Pasta do Google Drive</label>
+            <input type="text" id="folder_id" placeholder="ID que fica na URL da pasta do Drive">
         </div>
 
         <button onclick="generateLink()">Gerar Link Personalizado</button>
@@ -199,14 +193,23 @@
     </div>
 
     <script>
+        // Substitua abaixo pelo seu link de Web App padrão se desejar que ele venha preenchido automaticamente
+        const MEU_SCRIPT_PADRAO = ""; 
+
         function toggleAccountType() {
             const type = document.querySelector('input[name="account_type"]:checked').value;
+            const scriptInput = document.getElementById('script_url');
+            const scriptLabel = document.getElementById('script_label');
+            const folderContainer = document.getElementById('folder_field_container');
+
             if (type === 'minha') {
-                document.getElementById('minha_fields').style.display = 'block';
-                document.getElementById('client_fields').style.display = 'none';
+                scriptLabel.innerText = "Link do Web App (Google Apps Script)";
+                scriptInput.value = MEU_SCRIPT_PADRAO; // Restaura o seu link padrão
+                folderContainer.style.display = 'block'; // Mostra o ID da pasta
             } else {
-                document.getElementById('minha_fields').style.display = 'none';
-                document.getElementById('client_fields').style.display = 'block';
+                scriptLabel.innerText = "Link do Web App Exclusivo do Cliente";
+                scriptInput.value = ""; // Limpa o campo para o cliente colar o dele
+                folderContainer.style.display = 'none'; // Esconde a pasta (já que a conta do cliente salva no Drive dele)
             }
         }
 
@@ -217,29 +220,22 @@
             const textColor = document.getElementById('text_color').value;
             
             const type = document.querySelector('input[name="account_type"]:checked').value;
-            let scriptUrl = '';
-            let folderId = '';
+            const scriptUrl = document.getElementById('script_url').value.trim();
+            const folderId = document.getElementById('folder_id').value.trim();
 
-            let finalUrl = 'enviar.html';
-
-            if (type === 'minha') {
-                scriptUrl = document.getElementById('my_script_url').value.trim();
-                folderId = document.getElementById('folder_id').value.trim();
-                if (!scriptUrl || !folderId) {
-                    alert('Preencha o Link do seu Script e o ID da Pasta.');
-                    return;
-                }
-            } else {
-                scriptUrl = document.getElementById('client_script_url').value.trim();
-                if (!scriptUrl) {
-                    alert('Preencha o Link do Script do Cliente.');
-                    return;
-                }
+            if (!scriptUrl) {
+                alert('Por favor, preencha o Link do Web App.');
+                return;
             }
 
-            finalUrl += `?title=${encodeURIComponent(title)}&desc=${encodeURIComponent(desc)}&tcol=${encodeURIComponent(titleColor)}&col=${encodeURIComponent(textColor)}&script=${btoa(scriptUrl)}`;
+            if (type === 'minha' && !folderId) {
+                alert('Por favor, preencha o ID da Pasta do Google Drive.');
+                return;
+            }
+
+            let finalUrl = `enviar.html?title=${encodeURIComponent(title)}&desc=${encodeURIComponent(desc)}&tcol=${encodeURIComponent(titleColor)}&col=${encodeURIComponent(textColor)}&script=${btoa(scriptUrl)}`;
             
-            if (folderId) {
+            if (type === 'minha' && folderId) {
                 finalUrl += `&folder=${btoa(folderId)}`;
             }
 
