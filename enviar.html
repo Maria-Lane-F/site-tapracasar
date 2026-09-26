@@ -16,29 +16,10 @@
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            position: relative;
-        }
-
-        /* Camada escura para garantir legibilidade sobre qualquer foto de fundo */
-        .bg-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.65);
-            z-index: 1;
         }
 
         .container {
-            position: relative;
-            z-index: 2;
-            background: rgba(30, 30, 30, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(30, 30, 30, 0.95);
             padding: 30px;
             border-radius: 16px;
             width: 100%;
@@ -47,6 +28,16 @@
             text-align: center;
             box-sizing: border-box;
             border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Estilo para o Logotipo Fixo */
+        .logo-container {
+            margin-bottom: 15px;
+        }
+        .logo-img {
+            max-width: 120px; /* Ajuste o tamanho da logo conforme preferir */
+            max-height: 60px;
+            object-fit: contain;
         }
 
         .brand {
@@ -133,9 +124,12 @@
     </style>
 </head>
 <body>
-    <div class="bg-overlay"></div>
-
     <div class="container">
+        <!-- LOGOTIPO FIXO -->
+        <div class="logo-container">
+            <img src="URL_DO_SEU_LOGOTIPO" alt="Logo" class="logo-img" id="brand_logo">
+        </div>
+
         <div class="brand">TaPraCasar • Álbum Digital</div>
         <h1 id="event_title_display">Carregando evento...</h1>
         <p class="desc" id="event_desc_display">Aguarde um instante.</p>
@@ -166,7 +160,6 @@
         window.onload = function() {
             const title = getUrlParameter('title');
             const desc = getUrlParameter('desc');
-            const bgImg = getUrlParameter('bgimg');
             const tcol = getUrlParameter('tcol');
             const col = getUrlParameter('col');
 
@@ -181,11 +174,6 @@
                 document.getElementById('event_desc_display').innerText = desc;
             } else {
                 document.getElementById('event_desc_display').innerText = 'Envie suas fotos favoritas da nossa celebração!';
-            }
-
-            // Aplica a imagem de fundo se informada na URL
-            if (bgImg) {
-                document.body.style.backgroundImage = `url('${bgImg}')`;
             }
 
             if (tcol) {
