@@ -172,13 +172,13 @@
             <label><input type="radio" name="account_type" value="cliente" onclick="toggleAccountType()"> Conta do Cliente (Whitelabel)</label>
         </div>
 
-        <!-- CAMPO COMPARTILHADO DE SCRIPT (Adapta o comportamento conforme a escolha) -->
+        <!-- CAMPO COMPARTILHADO DE SCRIPT -->
         <div class="form-group">
             <label id="script_label">Link do Web App (Google Apps Script)</label>
-            <input type="text" id="script_url" placeholder="https://script.google.com/macros/s/.../exec">
+            <input type="text" id="script_url" value="https://script.google.com/macros/s/AKfycbzj4VEpDRpDUvGLbehbmljxcxXTT8ASJnZ1X-AnIl5hJnCyI6vrpSeKO50OWPov-SPEyA/exec">
         </div>
 
-        <!-- ID DA PASTA (Fica visível apenas na opção "Minha Conta") -->
+        <!-- ID DA PASTA -->
         <div class="form-group" id="folder_field_container">
             <label>ID da Pasta do Google Drive</label>
             <input type="text" id="folder_id" placeholder="ID que fica na URL da pasta do Drive">
@@ -193,8 +193,7 @@
     </div>
 
     <script>
-        // Substitua abaixo pelo seu link de Web App padrão se desejar que ele venha preenchido automaticamente
-        const MEU_SCRIPT_PADRAO = ""; 
+        const MEU_SCRIPT_PADRAO = "https://script.google.com/macros/s/AKfycbzj4VEpDRpDUvGLbehbmljxcxXTT8ASJnZ1X-AnIl5hJnCyI6vrpSeKO50OWPov-SPEyA/exec"; 
 
         function toggleAccountType() {
             const type = document.querySelector('input[name="account_type"]:checked').value;
@@ -204,12 +203,12 @@
 
             if (type === 'minha') {
                 scriptLabel.innerText = "Link do Web App (Google Apps Script)";
-                scriptInput.value = MEU_SCRIPT_PADRAO; // Restaura o seu link padrão
-                folderContainer.style.display = 'block'; // Mostra o ID da pasta
+                scriptInput.value = MEU_SCRIPT_PADRAO; 
+                folderContainer.style.display = 'block'; 
             } else {
                 scriptLabel.innerText = "Link do Web App Exclusivo do Cliente";
-                scriptInput.value = ""; // Limpa o campo para o cliente colar o dele
-                folderContainer.style.display = 'none'; // Esconde a pasta (já que a conta do cliente salva no Drive dele)
+                scriptInput.value = ""; 
+                folderContainer.style.display = 'none'; 
             }
         }
 
