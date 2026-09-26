@@ -116,15 +116,16 @@
 
         <div class="form-group">
             <label id="label_name">Seu Nome (Opcional)</label>
-            <input type="text" id="guest_name" placeholder="Como quer assinar a foto?">
+            <input type="text" id="guest_name" placeholder="Como quer assinar as fotos?">
         </div>
 
         <div class="form-group">
-            <label id="label_file">Escolha a Foto</label>
-            <input type="file" id="photo_input" accept="image/*">
+            <label id="label_file">Escolha as Fotos (várias permitidas)</label>
+            <!-- ADICIONADO O ATRIBUTO "multiple" AQUI -->
+            <input type="file" id="photo_input" accept="image/*" multiple>
         </div>
 
-        <button id="upload_btn" onclick="uploadPhoto()">Enviar Foto</button>
+        <button id="upload_btn" onclick="uploadPhotos()">Enviar Fotos</button>
         
         <div id="status_msg"></div>
     </div>
@@ -170,7 +171,7 @@
             }
         };
 
-        function uploadPhoto() {
+        async function uploadPhotos() {
             const fileInput = document.getElementById('photo_input');
             const guestName = document.getElementById('guest_name').value.trim() || 'Convidado Anônimo';
             const statusMsg = document.getElementById('status_msg');
@@ -190,54 +191,75 @@
             const folderId = encodedFolder ? atob(encodedFolder) : '';
 
             if (fileInput.files.length === 0) {
-                alert('Por favor, escolha uma foto antes de enviar.');
+                alert('Por favor, escolha pelo menos uma foto antes de enviar.');
                 return;
             }
 
-            const file = fileInput.files[0];
+            const totalFiles = fileInput.files.length;
             uploadBtn.disabled = true;
-            uploadBtn.innerText = 'Enviando...';
             statusMsg.style.display = 'block';
             statusMsg.className = '';
-            statusMsg.innerText = 'Enviando sua foto, aguarde...';
 
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function () {
-                const base64Data = reader.result.split(',')[1];
-                
-                const payload = {
-                    filename: file.name,
-                    mimeType: file.type,
-                    data: base64Data,
-                    guestName: guestName,
-                    folderId: folderId
+            let successCount = 0;
+
+            // Loop para enviar cada foto selecionada uma a uma de forma organizada
+            for (let i = 0; i < totalFiles; i++) {
+                const file = fileInput.files[i];
+                uploadBtn.innerText = `Enviando ${i + 1} de ${totalFiles}...`;
+                statusMsg.innerText = `Enviando foto ${i + 1} de ${totalFiles} (${file.name})...`;
+
+                try {
+                    await sendSingleFile(file, guestName, scriptUrl, folderId);
+                    successCount++;
+                } catch (error) {
+                    console.error('Erro ao enviar o arquivo:', file.name, error);
+                }
+            }
+
+            // Finalização do lote
+            uploadBtn.disabled = false;
+            uploadBtn.innerText = 'Enviar Fotos';
+            fileInput.value = '';
+            document.getElementById('guest_name').value = '';
+
+            if (successCount === totalFiles) {
+                statusMsg.className = 'success';
+                statusMsg.innerText = `Sucesso! Todas as ${totalFiles} fotos foram enviadas com carinho.`;
+            } else {
+                statusMsg.className = 'error';
+                statusMsg.innerText = `Envio concluído: ${successCount} de ${totalFiles} fotos enviadas com sucesso.`;
+            }
+        }
+
+        // Função auxiliar que converte e envia um arquivo individual via fetch
+        function sendSingleFile(file, guestName, scriptUrl, folderId) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function () {
+                    const base64Data = reader.result.split(',')[1];
+                    
+                    const payload = {
+                        filename: file.name,
+                        mimeType: file.type,
+                        data: base64Data,
+                        guestName: guestName,
+                        folderId: folderId
+                    };
+
+                    fetch(scriptUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(() => resolve())
+                    .catch(error => reject(error));
                 };
-
-                fetch(scriptUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(() => {
-                    statusMsg.className = 'success';
-                    statusMsg.innerText = 'Foto enviada com sucesso! Obrigado por compartilhar esse momento.';
-                    fileInput.value = '';
-                    document.getElementById('guest_name').value = '';
-                    uploadBtn.disabled = false;
-                    uploadBtn.innerText = 'Enviar Foto';
-                })
-                .catch(error => {
-                    console.error('Erro:', error);
-                    statusMsg.className = 'error';
-                    statusMsg.innerText = 'Erro ao enviar. Tente novamente.';
-                    uploadBtn.disabled = false;
-                    uploadBtn.innerText = 'Enviar Foto';
-                });
-            };
+                reader.onerror = error => reject(error);
+            });
         }
     </script>
 </body>
