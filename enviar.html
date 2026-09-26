@@ -6,7 +6,7 @@
     <title id="page_title_meta">Álbum Digital</title>
     <style>
         body {
-            background: #121212;
+            background-color: #121212;
             color: #ffffff;
             font-family: 'Helvetica Neue', Arial, sans-serif;
             margin: 0;
@@ -16,35 +16,57 @@
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
         }
+
+        /* Camada escura para garantir legibilidade sobre qualquer foto de fundo */
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 1;
+        }
+
         .container {
-            background: rgba(30, 30, 30, 0.95);
+            position: relative;
+            z-index: 2;
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 30px;
-            border-radius: 12px;
+            border-radius: 16px;
             width: 100%;
             max-width: 450px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             text-align: center;
             box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .brand {
             font-size: 11px;
             letter-spacing: 2px;
-            color: #777;
+            color: #aaa;
             text-transform: uppercase;
             margin-bottom: 20px;
         }
         h1 {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 500;
             margin-bottom: 10px;
             color: #ffffff;
         }
         p.desc {
             font-size: 14px;
-            color: #aaaaaa;
+            color: #cccccc;
             margin-bottom: 25px;
-            line-height: 1.4;
+            line-height: 1.5;
         }
         .form-group {
             margin-bottom: 20px;
@@ -54,14 +76,14 @@
             display: block;
             margin-bottom: 6px;
             font-size: 13px;
-            color: #aaaaaa;
+            color: #cccccc;
         }
         input[type="text"], input[type="file"] {
             width: 100%;
             padding: 12px;
-            border: 1px solid #333;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
-            background: #2a2a2a;
+            background: rgba(20, 20, 20, 0.8);
             color: #fff;
             box-sizing: border-box;
             font-size: 14px;
@@ -83,7 +105,7 @@
             margin-top: 10px;
         }
         button:hover {
-            background: #dddddd;
+            background: #e0e0e0;
         }
         button:disabled {
             background: #555;
@@ -94,21 +116,25 @@
             margin-top: 20px;
             font-size: 13px;
             display: none;
-            padding: 10px;
-            border-radius: 6px;
-            background: #222;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(20, 20, 20, 0.9);
         }
         #status_msg.error {
-            color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.1);
+            color: #ff8787;
+            background: rgba(255, 107, 107, 0.15);
+            border: 1px solid rgba(255, 107, 107, 0.3);
         }
         #status_msg.success {
-            color: #51cf66;
-            background: rgba(81, 207, 102, 0.1);
+            color: #69db7c;
+            background: rgba(81, 207, 102, 0.15);
+            border: 1px solid rgba(81, 207, 102, 0.3);
         }
     </style>
 </head>
 <body>
+    <div class="bg-overlay"></div>
+
     <div class="container">
         <div class="brand">TaPraCasar • Álbum Digital</div>
         <h1 id="event_title_display">Carregando evento...</h1>
@@ -121,7 +147,6 @@
 
         <div class="form-group">
             <label id="label_file">Escolha as Fotos (várias permitidas)</label>
-            <!-- ADICIONADO O ATRIBUTO "multiple" AQUI -->
             <input type="file" id="photo_input" accept="image/*" multiple>
         </div>
 
@@ -141,7 +166,7 @@
         window.onload = function() {
             const title = getUrlParameter('title');
             const desc = getUrlParameter('desc');
-            const bg = getUrlParameter('bg');
+            const bgImg = getUrlParameter('bgimg');
             const tcol = getUrlParameter('tcol');
             const col = getUrlParameter('col');
 
@@ -158,9 +183,11 @@
                 document.getElementById('event_desc_display').innerText = 'Envie suas fotos favoritas da nossa celebração!';
             }
 
-            if (bg) {
-                document.body.style.setProperty('background-color', bg, 'important');
+            // Aplica a imagem de fundo se informada na URL
+            if (bgImg) {
+                document.body.style.backgroundImage = `url('${bgImg}')`;
             }
+
             if (tcol) {
                 document.getElementById('event_title_display').style.setProperty('color', tcol, 'important');
             }
@@ -202,7 +229,6 @@
 
             let successCount = 0;
 
-            // Loop para enviar cada foto selecionada uma a uma de forma organizada
             for (let i = 0; i < totalFiles; i++) {
                 const file = fileInput.files[i];
                 uploadBtn.innerText = `Enviando ${i + 1} de ${totalFiles}...`;
@@ -216,7 +242,6 @@
                 }
             }
 
-            // Finalização do lote
             uploadBtn.disabled = false;
             uploadBtn.innerText = 'Enviar Fotos';
             fileInput.value = '';
@@ -231,7 +256,6 @@
             }
         }
 
-        // Função auxiliar que converte e envia um arquivo individual via fetch
         function sendSingleFile(file, guestName, scriptUrl, folderId) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
