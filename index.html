@@ -154,19 +154,19 @@
             <textarea id="event_desc" placeholder="Mensagem para os convidados...">Envie suas fotos favoritas da nossa celebração!</textarea>
         </div>
 
-        <div class="section-title">2. Cores da Página</div>
+        <div class="section-title">2. Personalização Visual</div>
+        <div class="form-group">
+            <label>Link da Imagem de Fundo (URL / Google Fotos)</label>
+            <input type="text" id="bg_img" placeholder="Cole o link direto da imagem aqui">
+        </div>
         <div class="color-row">
-            <div class="form-group color-group">
-                <label>Cor de Fundo</label>
-                <input type="color" id="bg_color" value="#121212">
-            </div>
             <div class="form-group color-group">
                 <label>Cor do Título</label>
                 <input type="color" id="title_color" value="#ffffff">
             </div>
             <div class="form-group color-group">
                 <label>Cor do Texto</label>
-                <input type="color" id="text_color" value="#aaaaaa">
+                <input type="color" id="text_color" value="#cccccc">
             </div>
         </div>
 
@@ -179,7 +179,7 @@
         <div id="minha_fields">
             <div class="form-group">
                 <label>Link do Web App (Google Apps Script)</label>
-                <input type="text" id="my_script_url" placeholder="https://script.google.com/macros/s/AKfycbzj4VEpDRpDUvGLbehbmljxcxXTT8ASJnZ1X-AnIl5hJnCyI6vrpSeKO50OWPov-SPEyA/exec">
+                <input type="text" id="my_script_url" placeholder="https://script.google.com/macros/s/.../exec">
             </div>
             <div class="form-group">
                 <label>ID da Pasta do Google Drive</label>
@@ -217,7 +217,7 @@
         function generateLink() {
             const title = document.getElementById('event_title').value.trim();
             const desc = document.getElementById('event_desc').value.trim();
-            const bgColor = document.getElementById('bg_color').value;
+            const bgImg = document.getElementById('bg_img').value.trim();
             const titleColor = document.getElementById('title_color').value;
             const textColor = document.getElementById('text_color').value;
             
@@ -242,7 +242,11 @@
                 }
             }
 
-            finalUrl += `?title=${encodeURIComponent(title)}&desc=${encodeURIComponent(desc)}&bg=${encodeURIComponent(bgColor)}&tcol=${encodeURIComponent(titleColor)}&col=${encodeURIComponent(textColor)}&script=${btoa(scriptUrl)}`;
+            finalUrl += `?title=${encodeURIComponent(title)}&desc=${encodeURIComponent(desc)}&tcol=${encodeURIComponent(titleColor)}&col=${encodeURIComponent(textColor)}&script=${btoa(scriptUrl)}`;
+            
+            if (bgImg) {
+                finalUrl += `&bgimg=${encodeURIComponent(bgImg)}`;
+            }
             if (folderId) {
                 finalUrl += `&folder=${btoa(folderId)}`;
             }
