@@ -53,9 +53,11 @@
             background-color: #d81b60;
         }
         .counter {
-            font-size: 13px;
-            color: #888888;
+            font-size: 12px;
+            color: #ff6b6b; /* Destaque para facilitar leitura do erro */
             margin-bottom: 30px;
+            word-break: break-word;
+            padding: 0 10px;
         }
         .gallery-grid {
             display: grid;
@@ -131,7 +133,7 @@
 
         function loadGallery() {
             if (!SCRIPT_URL) {
-                document.getElementById('photo-counter').innerText = "Link do Script não configurado";
+                document.getElementById('photo-counter').innerText = "Erro: Link do Script não configurado na URL";
                 return;
             }
 
@@ -146,10 +148,11 @@
             })
             .then(response => response.json())
             .then(data => {
+                const counterEl = document.getElementById('photo-counter');
                 if (data.status === "success") {
+                    counterEl.style.color = "#888888"; // cor normal se der certo
                     const photos = data.photos;
                     const galleryEl = document.getElementById('gallery');
-                    const counterEl = document.getElementById('photo-counter');
                     
                     galleryEl.innerHTML = "";
                     counterEl.innerText = `${photos.length} fotografias`;
@@ -165,12 +168,13 @@
                         galleryEl.appendChild(item);
                     });
                 } else {
-                    document.getElementById('photo-counter').innerText = "Erro ao carregar fotografias do servidor";
+                    // MOSTRA O ERRO EXATO VINDO DO GOOGLE APPS SCRIPT
+                    counterEl.innerText = data.message;
                 }
             })
             .catch(err => {
-                console.error("Erro ao carregar galeria:", err);
-                document.getElementById('photo-counter').innerText = "Erro de conexão com o álbum";
+                console.error("Erro de rede:", err);
+                document.getElementById('photo-counter').innerText = "Erro de rede/conexão: " + err.message;
             });
         }
 
@@ -204,18 +208,22 @@
                     })
                     .then(res => res.json())
                     .then(resData => {
-                        uploadedCount++;
-                        if (uploadedCount === files.length) {
-                            statusMsg.innerText = "Fotografias enviadas com sucesso!";
-                            setTimeout(() => {
-                                statusMsg.style.display = 'none';
-                                loadGallery(); 
-                            }, 1500);
+                        if (resData.status === "success") {
+                            uploadedCount++;
+                            if (uploadedCount === files.length) {
+                                statusMsg.innerText = "Fotografias enviadas com sucesso!";
+                                setTimeout(() => {
+                                    statusMsg.style.display = 'none';
+                                    loadGallery(); 
+                                }, 1500);
+                            }
+                        } else {
+                            statusMsg.innerText = "Erro ao enviar: " + resData.message;
                         }
                     })
                     .catch(error => {
                         console.error('Erro:', error);
-                        statusMsg.innerText = "Erro ao enviar fotografia.";
+                        statusMsg.innerText = "Erro de rede ao enviar fotografia.";
                     });
                 };
 
