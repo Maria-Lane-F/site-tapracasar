@@ -3,275 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page_title_meta">Álbum Digital</title>
+    <title>Álbum do Evento</title>
     <style>
         body {
-            background-color: #121212;
+            background-color: #0f0f0f;
             color: #ffffff;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
         }
-
         .container {
-            background: rgba(30, 30, 30, 0.95);
-            padding: 30px;
-            border-radius: 16px;
             width: 100%;
-            max-width: 450px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            max-width: 480px;
             text-align: center;
-            box-sizing: border-box;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Estilo para o Logotipo Fixo */
-        .logo-container {
-            margin-bottom: 15px;
-        }
-        .logo-img {
-            max-width: 120px; /* Ajuste o tamanho da logo conforme preferir */
-            max-height: 60px;
-            object-fit: contain;
-        }
-
-        .brand {
-            font-size: 11px;
-            letter-spacing: 2px;
-            color: #aaa;
-            text-transform: uppercase;
-            margin-bottom: 20px;
+            padding-bottom: 50px;
         }
         h1 {
-            font-size: 24px;
-            font-weight: 500;
-            margin-bottom: 10px;
-            color: #ffffff;
+            font-size: 26px;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 5px;
         }
         p.desc {
             font-size: 14px;
-            color: #cccccc;
+            color: #aaaaaa;
             margin-bottom: 25px;
-            line-height: 1.5;
         }
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 13px;
-            color: #cccccc;
-        }
-        input[type="text"], input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            background: rgba(20, 20, 20, 0.8);
-            color: #fff;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-        input[type="file"] {
-            cursor: pointer;
-        }
-        button {
-            width: 100%;
-            padding: 15px;
-            background: #ffffff;
-            color: #000000;
+        /* Botão principal estilo app */
+        .btn-upload {
+            background-color: #e91e63;
+            color: #ffffff;
             border: none;
-            border-radius: 8px;
-            font-size: 15px;
+            border-radius: 30px;
+            padding: 14px 28px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 10px;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4);
+            transition: background 0.2s, transform 0.1s;
+            margin-bottom: 15px;
         }
-        button:hover {
-            background: #e0e0e0;
+        .btn-upload:active {
+            transform: scale(0.98);
         }
-        button:disabled {
-            background: #555;
-            color: #888;
-            cursor: not-allowed;
+        .btn-upload:hover {
+            background-color: #d81b60;
         }
-        #status_msg {
-            margin-top: 20px;
+        .counter {
             font-size: 13px;
+            color: #888888;
+            margin-bottom: 30px;
+        }
+        /* Grade de fotos (Galeria) */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .gallery-item {
+            aspect-ratio: 1;
+            background-color: #222;
+            overflow: hidden;
+            position: relative;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .gallery-item img:hover {
+            transform: scale(1.05);
+        }
+        /* Status de envio */
+        #status-msg {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #4CAF50;
             display: none;
-            padding: 12px;
-            border-radius: 8px;
-            background: rgba(20, 20, 20, 0.9);
         }
-        #status_msg.error {
-            color: #ff8787;
-            background: rgba(255, 107, 107, 0.15);
-            border: 1px solid rgba(255, 107, 107, 0.3);
-        }
-        #status_msg.success {
-            color: #69db7c;
-            background: rgba(81, 207, 102, 0.15);
-            border: 1px solid rgba(81, 207, 102, 0.3);
+        /* Input de arquivo invisível */
+        #file-input {
+            display: none;
         }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <!-- LOGOTIPO FIXO -->
-        <div class="logo-container">
-            <img src="https://cdn-icons-png.flaticon.com/512/7565/7565056.png" alt="Logo" class="logo-img" id="brand_logo">
+        <!-- Título e Descrição dinâmicos -->
+        <h1 id="event-title">Carregando...</h1>
+        <p class="desc" id="event-desc">Aguarde um instante...</p>
+
+        <!-- Botão para Adicionar Foto -->
+        <button class="btn-upload" onclick="document.getElementById('file-input').click()">+ Enviar foto ou vídeo</button>
+        <input type="file" id="file-input" accept="image/*" multiple onchange="handleFiles(this.files)">
+
+        <div id="status-msg">Enviando foto... Por favor, aguarde.</div>
+
+        <!-- Contador de mídias -->
+        <div class="counter" id="photo-counter">Carregando galeria...</div>
+
+        <!-- Galeria em Grade -->
+        <div class="gallery-grid" id="gallery">
+            <!-- As fotos do Drive aparecerão aqui dinamicamente -->
         </div>
-
-        <div class="brand">Álbum Digital</div>
-        <h1 id="event_title_display">Carregando evento...</h1>
-        <p class="desc" id="event_desc_display">Aguarde um instante.</p>
-
-        <div class="form-group">
-            <label id="label_name">Seu Nome (Opcional)</label>
-            <input type="text" id="guest_name" placeholder="Digite o seu nome">
-        </div>
-
-        <div class="form-group">
-            <label id="label_file">Escolha as Fotos (várias permitidas)</label>
-            <input type="file" id="photo_input" accept="image/*" multiple>
-        </div>
-
-        <button id="upload_btn" onclick="uploadPhotos()">Enviar Fotos</button>
-        
-        <div id="status_msg"></div>
     </div>
 
     <script>
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        // Função para ler parâmetros da URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
         }
 
+        // Decodificar parâmetros de segurança (base64)
+        const title = getQueryParam('title') || "Nosso Álbum";
+        const desc = getQueryParam('desc') || "Compartilhe suas fotos conosco!";
+        const titleColor = getQueryParam('tcol') || "#ffffff";
+        const textColor = getQueryParam('col') || "#cccccc";
+        
+        const scriptBase64 = getQueryParam('script');
+        const folderBase64 = getQueryParam('folder');
+
+        const SCRIPT_URL = scriptBase64 ? atob(scriptBase64) : "";
+        const FOLDER_ID = folderBase64 ? atob(folderBase64) : "";
+
+        // Aplicar textos e cores personalizadas
+        document.getElementById('event-title').innerText = title;
+        document.getElementById('event-title').style.color = titleColor;
+        
+        document.getElementById('event-desc').innerText = desc;
+        document.getElementById('event-desc').style.color = textColor;
+
+        // Carregar galeria ao abrir a página
         window.onload = function() {
-            const title = getUrlParameter('title');
-            const desc = getUrlParameter('desc');
-            const tcol = getUrlParameter('tcol');
-            const col = getUrlParameter('col');
-
-            if (title) {
-                document.getElementById('event_title_display').innerText = title;
-                document.getElementById('page_title_meta').innerText = title;
-            } else {
-                document.getElementById('event_title_display').innerText = 'Casamento Exemplo';
-            }
-
-            if (desc) {
-                document.getElementById('event_desc_display').innerText = desc;
-            } else {
-                document.getElementById('event_desc_display').innerText = 'Envie suas fotos favoritas da nossa celebração!';
-            }
-
-            if (tcol) {
-                document.getElementById('event_title_display').style.setProperty('color', tcol, 'important');
-            }
-            if (col) {
-                document.getElementById('event_desc_display').style.setProperty('color', col, 'important');
-                document.getElementById('label_name').style.setProperty('color', col, 'important');
-                document.getElementById('label_file').style.setProperty('color', col, 'important');
-            }
+            loadGallery();
         };
 
-        async function uploadPhotos() {
-            const fileInput = document.getElementById('photo_input');
-            const guestName = document.getElementById('guest_name').value.trim() || 'Convidado Anônimo';
-            const statusMsg = document.getElementById('status_msg');
-            const uploadBtn = document.getElementById('upload_btn');
+        function loadGallery() {
+            if (!SCRIPT_URL) return;
 
-            const encodedScript = getUrlParameter('script');
-            const encodedFolder = getUrlParameter('folder');
+            let fetchUrl = `${SCRIPT_URL}?folderId=${encodeURIComponent(FOLDER_ID)}`;
 
-            if (!encodedScript) {
-                statusMsg.style.display = 'block';
-                statusMsg.className = 'error';
-                statusMsg.innerText = 'Erro: Link do script não configurado.';
-                return;
-            }
+            fetch(fetchUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        const photos = data.photos;
+                        const galleryEl = document.getElementById('gallery');
+                        const counterEl = document.getElementById('photo-counter');
+                        
+                        galleryEl.innerHTML = "";
+                        counterEl.innerText = `${photos.length} fotos & vídeos`;
 
-            const scriptUrl = atob(encodedScript);
-            const folderId = encodedFolder ? atob(encodedFolder) : '';
-
-            if (fileInput.files.length === 0) {
-                alert('Por favor, escolha pelo menos uma foto antes de enviar.');
-                return;
-            }
-
-            const totalFiles = fileInput.files.length;
-            uploadBtn.disabled = true;
-            statusMsg.style.display = 'block';
-            statusMsg.className = '';
-
-            let successCount = 0;
-
-            for (let i = 0; i < totalFiles; i++) {
-                const file = fileInput.files[i];
-                uploadBtn.innerText = `Enviando ${i + 1} de ${totalFiles}...`;
-                statusMsg.innerText = `Enviando foto ${i + 1} de ${totalFiles} (${file.name})...`;
-
-                try {
-                    await sendSingleFile(file, guestName, scriptUrl, folderId);
-                    successCount++;
-                } catch (error) {
-                    console.error('Erro ao enviar o arquivo:', file.name, error);
-                }
-            }
-
-            uploadBtn.disabled = false;
-            uploadBtn.innerText = 'Enviar Fotos';
-            fileInput.value = '';
-            document.getElementById('guest_name').value = '';
-
-            if (successCount === totalFiles) {
-                statusMsg.className = 'success';
-                statusMsg.innerText = `Sucesso! Todas as ${totalFiles} fotos foram enviadas com carinho.`;
-            } else {
-                statusMsg.className = 'error';
-                statusMsg.innerText = `Envio concluído: ${successCount} de ${totalFiles} fotos enviadas com sucesso.`;
-            }
+                        photos.forEach(photo => {
+                            const item = document.createElement('div');
+                            item.className = 'gallery-item';
+                            item.innerHTML = `<img src="${photo.url}" loading="lazy" alt="Foto do evento">`;
+                            galleryEl.appendChild(item);
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error("Erro ao carregar galeria:", err);
+                    document.getElementById('photo-counter').innerText = "Álbum pronto para receber fotos";
+                });
         }
 
-        function sendSingleFile(file, guestName, scriptUrl, folderId) {
-            return new Promise((resolve, reject) => {
+        // Função de envio da foto selecionada pelo convidado
+        function handleFiles(files) {
+            if (files.length === 0) return;
+
+            const statusMsg = document.getElementById('status-msg');
+            statusMsg.style.display = 'block';
+            statusMsg.innerText = `Enviando ${files.length} foto(s)...`;
+
+            let uploadedCount = 0;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
                 const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = function () {
-                    const base64Data = reader.result.split(',')[1];
+
+                reader.onload = function(e) {
+                    const base64Data = e.target.result.split(',')[1];
                     
                     const payload = {
                         filename: file.name,
                         mimeType: file.type,
                         data: base64Data,
-                        guestName: guestName,
-                        folderId: folderId
+                        guestName: "Convidado",
+                        folderId: FOLDER_ID
                     };
 
-                    fetch(scriptUrl, {
+                    fetch(SCRIPT_URL, {
                         method: 'POST',
-                        mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
                         body: JSON.stringify(payload)
                     })
-                    .then(() => resolve())
-                    .catch(error => reject(error));
+                    .then(res => res.json())
+                    .then(resData => {
+                        uploadedCount++;
+                        if (uploadedCount === files.length) {
+                            statusMsg.innerText = "Fotos enviadas com sucesso! Atualizando galeria...";
+                            setTimeout(() => {
+                                statusMsg.style.display = 'none';
+                                loadGallery(); // Atualiza a grade automaticamente
+                            }, 1500);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        statusMsg.innerText = "Erro ao enviar foto.";
+                    });
                 };
-                reader.onerror = error => reject(error);
-            });
+
+                reader.readAsDataURL(file);
+            }
         }
     </script>
 </body>
