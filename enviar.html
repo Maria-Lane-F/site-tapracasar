@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -100,12 +100,12 @@
 <body>
 
     <div class="container">
-        <!-- Logotipo do Evento -->
+        <!-- Logótipo do Evento (Fixo) -->
         <div class="logo-container" id="logo-container" style="display: none;">
-            <img id="event-logo" alt="Logotipo">
+            <img id="event-logo" alt="Logótipo">
         </div>
 
-        <h1 id="event-title">Carregando...</h1>
+        <h1 id="event-title">A carregar...</h1>
         <p class="desc" id="event-desc">Aguarde um instante...</p>
 
         <button class="btn-upload" onclick="document.getElementById('file-input').click()">+ Enviar foto ou vídeo</button>
@@ -131,7 +131,6 @@
         
         const scriptBase64 = getQueryParam('script');
         const folderBase64 = getQueryParam('folder');
-        const logoParam = getQueryParam('logo');
 
         const SCRIPT_URL = scriptBase64 ? atob(scriptBase64) : "";
         const FOLDER_ID = folderBase64 ? atob(folderBase64) : "";
@@ -143,17 +142,15 @@
         document.getElementById('event-desc').innerText = desc;
         document.getElementById('event-desc').style.color = textColor;
 
-        // Configurar Logotipo
-        if (logoParam) {
-            let logoUrl = logoParam;
-            if (!logoParam.startsWith('http')) {
-                try { logoUrl = atob(logoParam); } catch(e) {}
-            }
-            if (logoUrl) {
-                const logoImg = document.getElementById('event-logo');
-                logoImg.src = logoUrl;
-                document.getElementById('logo-container').style.display = 'block';
-            }
+        // ==========================================
+        // LOGÓTIPO FIXO (Altere o link abaixo para o seu)
+        // ==========================================
+        const FIXED_LOGO_URL = ""; // Exemplo: "https://i.imgur.com/exemplo.png" ou o link direto da imagem
+
+        if (FIXED_LOGO_URL && FIXED_LOGO_URL.trim() !== "") {
+            const logoImg = document.getElementById('event-logo');
+            logoImg.src = FIXED_LOGO_URL;
+            document.getElementById('logo-container').style.display = 'block';
         }
 
         window.onload = function() {
