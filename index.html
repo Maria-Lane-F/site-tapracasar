@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Administrador • Aeterna</title>
+    <title>Painel do Administrador • TaPraCasar</title>
     <style>
         body {
             background: #121212;
@@ -141,7 +141,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="brand">Aeterna • Painel Admin</div>
+        <div class="brand">TaPraCasar • Painel Admin</div>
         <h1>Configuração do Evento</h1>
         
         <div class="section-title">1. Informações da Página</div>
@@ -164,6 +164,10 @@
                 <label>Cor do Texto</label>
                 <input type="color" id="text_color" value="#cccccc">
             </div>
+            <div class="form-group color-group">
+                <label>Cor do Botão</label>
+                <input type="color" id="button_color" value="#e91e63">
+            </div>
         </div>
 
         <div class="section-title">3. Destino das Fotos (Google Drive)</div>
@@ -172,17 +176,20 @@
             <label><input type="radio" name="account_type" value="cliente" onclick="toggleAccountType()"> Conta do Cliente (Whitelabel)</label>
         </div>
 
-        <!-- CAMPO COMPARTILHADO DE SCRIPT COM O LINK JÁ FIXO NO VALUE -->
         <div class="form-group">
             <label id="script_label">Link do Web App (Google Apps Script)</label>
-            <!--<input type="text" id="script_url" value="https://script.google.com/macros/s/AKfycbzj4VEpDRpDUvGLbehbmljxcxXTT8ASJnZ1X-AnIl5hJnCyI6vrpSeKO50OWPov-SPEyA/exec"> -->
             <input type="text" id="script_url" value="https://script.google.com/macros/s/AKfycbza77Mc5R9JSbM1KuACetaX_ga1vIurK4Y_GTqPuHi9XJJlnK_fdYVKIFj1N5t9kiZB/exec">
         </div>
 
-        <!-- ID DA PASTA -->
         <div class="form-group" id="folder_field_container">
             <label>ID da Pasta do Google Drive</label>
             <input type="text" id="folder_id" placeholder="ID que fica na URL da pasta do Drive">
+        </div>
+
+        <div class="section-title">4. Registo Automático (Planilha Google)</div>
+        <div class="form-group">
+            <label>ID da Planilha de Controlo (Opcional)</label>
+            <input type="text" id="sheet_id" placeholder="Cole o ID da sua Google Sheet para guardar os clientes gerados">
         </div>
 
         <button onclick="generateLink()">Gerar Link Personalizado</button>
@@ -190,6 +197,7 @@
         <div id="result_area">
             <p><strong>Link gerado com sucesso! Copie ou abra abaixo:</strong></p>
             <a id="final_link" href="#" target="_blank"></a>
+            <p id="save_status" style="margin-top: 10px; color: #4CAF50; font-size: 12px; display: none;"></p>
         </div>
     </div>
 
@@ -218,10 +226,12 @@
             const desc = document.getElementById('event_desc').value.trim();
             const titleColor = document.getElementById('title_color').value;
             const textColor = document.getElementById('text_color').value;
+            const buttonColor = document.getElementById('button_color').value;
             
             const type = document.querySelector('input[name="account_type"]:checked').value;
             const scriptUrl = document.getElementById('script_url').value.trim();
             const folderId = document.getElementById('folder_id').value.trim();
+            const sheetId = document.getElementById('sheet_id').value.trim();
 
             if (!scriptUrl) {
                 alert('Por favor, preencha o Link do Web App.');
@@ -233,7 +243,8 @@
                 return;
             }
 
-            let finalUrl = `enviar.html?title=${encodeURIComponent(title)}&desc=${encodeURIComponent(desc)}&tcol=${encodeURIComponent(titleColor)}&col=${encodeURIComponent(textColor)}&script=${btoa(scriptUrl)}`;
+            // Monta o link incluindo o parâmetro de cor do botão (&bcol=)
+            let finalUrl = `enviar.html?title=${encodeURIComponent(title)}&desc=${encodeURIComponent(desc)}&tcol=${encodeURIComponent(titleColor)}&col=${encodeURIComponent(textColor)}&bcol=${encodeURIComponent(buttonColor)}&script=${btoa(scriptUrl)}`;
             
             if (type === 'minha' && folderId) {
                 finalUrl += `&folder=${btoa(folderId)}`;
@@ -242,7 +253,43 @@
             const linkElement = document.getElementById('final_link');
             linkElement.href = finalUrl;
             linkElement.innerText = "Abrir Página do Convidado Personalizada";
-            document.getElementById('result_area').style.display = 'block';
+            
+            const resultArea = document.getElementById('result_area');
+            const saveStatus = document.getElementById('save_status');
+            resultArea.style.display = 'block';
+            saveStatus.style.display = 'none';
+
+            // Se o ID da planilha foi preenchido, envia os dados para guardar automaticamente
+            if (sheetId) {
+                saveStatus.style.display = 'block';
+                saveStatus.innerText = "A guardar cliente na planilha Google...";
+
+                const payload = {
+                    action: "save_client",
+                    sheetId: sheetId,
+                    eventName: title,
+                    folderId: folderId || "Exclusivo do Cliente",
+                    eventLink: finalUrl,
+                    buttonColor: buttonColor
+                };
+
+                fetch(scriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        saveStatus.innerText = "✓ Cliente guardado com sucesso na planilha!";
+                    } else {
+                        saveStatus.innerText = "Aviso: " + data.message;
+                    }
+                })
+                .catch(err => {
+                    console.error("Erro ao guardar na planilha:", err);
+                    saveStatus.innerText = "Erro ao comunicar com o servidor para guardar na planilha.";
+                });
+            }
         }
     </script>
 </body>
