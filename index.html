@@ -178,7 +178,7 @@
 
         <div class="form-group">
             <label id="script_label">Link do Web App (Google Apps Script)</label>
-            <input type="text" id="script_url" value="https://script.google.com/macros/s/AKfycbx_u5QX-Uilzq0QOh_K-lT4lWlZ9apG_j4v1ZjIGHHYVpCxxv8yr6e32CWSxx1frjkS1Q/exec">
+            <input type="text" id="script_url" value="https://script.google.com/macros/s/AKfycbx_u5QX-UilzqQ0h_K-IT4IWlZ9apG_j4v1...">
         </div>
 
         <div class="form-group" id="folder_field_container">
@@ -192,6 +192,7 @@
             <input type="text" id="sheet_id" placeholder="Cole o ID da sua Google Sheet para guardar os dados">
         </div>
 
+        <!-- Corrigido para chamar generateLink() -->
         <button onclick="generateLink()">Gerar Link Personalizado</button>
 
         <div id="result_area">
@@ -202,7 +203,7 @@
     </div>
 
     <script>
-        const MEU_SCRIPT_PADRAO = "https://script.google.com/macros/s/AKfycbx_u5QX-Uilzq0QOh_K-lT4lWlZ9apG_j4v1ZjIGHHYVpCxxv8yr6e32CWSxx1frjkS1Q/exec"; 
+        const MEU_SCRIPT_PADRAO = "https://script.google.com/macros/s/AKfycbx_u5QX-UilzqQ0h_K-IT4IWlZ9apG_j4v1..."; 
 
         function toggleAccountType() {
             const type = document.querySelector('input[name="account_type"]:checked').value;
@@ -210,4 +211,94 @@
             const scriptLabel = document.getElementById('script_label');
             const folderContainer = document.getElementById('folder_field_container');
 
-            if (type === 'min
+            if (type === 'minha') {
+                scriptLabel.innerText = "Link do Web App (Google Apps Script)";
+                scriptInput.value = MEU_SCRIPT_PADRAO; 
+                folderContainer.style.display = 'block'; 
+            } else {
+                scriptLabel.innerText = "Link do Web App Exclusivo do Cliente";
+                scriptInput.value = ""; 
+                folderContainer.style.display = 'none'; 
+            }
+        }
+
+        // Nome da função atualizado para generateLink para corresponder ao botão
+        function generateLink() {
+            const title = document.getElementById('event_title').value.trim();
+            const desc = document.getElementById('event_desc').value.trim();
+            const titleColor = document.getElementById('title_color').value;
+            const textColor = document.getElementById('text_color').value;
+            const buttonColor = document.getElementById('button_color').value;
+            
+            const typeRadio = document.querySelector('input[name="account_type"]:checked').value;
+            const accountTypeStr = typeRadio === 'minha' ? 'Minha Conta' : 'Conta do Cliente';
+            const scriptUrl = document.getElementById('script_url').value.trim();
+            const folderId = document.getElementById('folder_id').value.trim();
+            const sheetId = document.getElementById('sheet_id').value.trim();
+
+            if (!scriptUrl) {
+                alert('Por favor, preencha o Link do Web App.');
+                return;
+            }
+
+            if (typeRadio === 'minha' && !folderId) {
+                alert('Por favor, preencha o ID da Pasta do Google Drive.');
+                return;
+            }
+
+            // Monta o link para o convidado incluindo todas as customizações
+            let finalUrl = `enviar.html?title=${encodeURIComponent(title)}&desc=${encodeURIComponent(desc)}&tcol=${encodeURIComponent(titleColor)}&col=${encodeURIComponent(textColor)}&bcol=${encodeURIComponent(buttonColor)}&script=${btoa(scriptUrl)}`;
+            
+            if (typeRadio === 'minha' && folderId) {
+                finalUrl += `&folder=${btoa(folderId)}`;
+            }
+
+            const linkElement = document.getElementById('final_link');
+            linkElement.href = finalUrl;
+            linkElement.innerText = "Abrir Página do Convidado Personalizada";
+            
+            const resultArea = document.getElementById('result_area');
+            const saveStatus = document.getElementById('save_status');
+            resultArea.style.display = 'block';
+            saveStatus.style.display = 'none';
+
+            // Envia TODOS os dados personalizados para a Planilha Google se o ID estiver preenchido
+            if (sheetId) {
+                saveStatus.style.display = 'block';
+                saveStatus.innerText = "A guardar informações completas na planilha Google...";
+
+                const payload = {
+                    action: "save_client",
+                    sheetId: sheetId,
+                    eventName: title,
+                    eventDesc: desc,
+                    titleColor: titleColor,
+                    textColor: textColor,
+                    buttonColor: buttonColor,
+                    accountType: accountTypeStr,
+                    scriptUrl: scriptUrl,
+                    folderId: folderId || "Exclusivo do Cliente",
+                    eventLink: finalUrl
+                };
+
+                fetch(scriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        saveStatus.innerText = "✓ Todas as informações foram guardadas com sucesso na planilha!";
+                    } else {
+                        saveStatus.innerText = "Aviso: " + data.message;
+                    }
+                })
+                .catch(err => {
+                    console.error("Erro ao guardar na planilha:", err);
+                    saveStatus.innerText = "Erro ao comunicar com o servidor para guardar na planilha.";
+                });
+            }
+        }
+    </script>
+</body>
+</html>
