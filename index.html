@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -147,7 +147,7 @@
         <div class="section-title">1. Informações da Página</div>
         <div class="form-group">
             <label>Título do Evento</label>
-            <input type="text" id="event_title" placeholder="Ex: Casamento Ana & Bruno" value="Evento TaPraCasar">
+            <input type="text" id="event_title" placeholder="Ex: Casamento Ana & Bruno" value="Geralda 80 anos">
         </div>
         <div class="form-group">
             <label>Subtítulo / Descrição</label>
@@ -158,7 +158,7 @@
         <div class="color-row">
             <div class="form-group color-group">
                 <label>Cor do Título</label>
-                <input type="color" id="title_color" value="#ffffff">
+                <input type="color" id="title_color" value="#d32f2f">
             </div>
             <div class="form-group color-group">
                 <label>Cor do Texto</label>
@@ -188,8 +188,8 @@
 
         <div class="section-title">4. Registo Automático (Planilha Google)</div>
         <div class="form-group">
-            <label>ID da Planilha de Controlo (Opcional)</label>
-            <input type="text" id="sheet_id" placeholder="Cole o ID da sua Google Sheet para guardar os clientes gerados">
+            <label>ID da Planilha de Controlo</label>
+            <input type="text" id="sheet_id" placeholder="Cole o ID da sua Google Sheet para guardar os dados">
         </div>
 
         <button onclick="generateLink()">Gerar Link Personalizado</button>
@@ -210,87 +210,4 @@
             const scriptLabel = document.getElementById('script_label');
             const folderContainer = document.getElementById('folder_field_container');
 
-            if (type === 'minha') {
-                scriptLabel.innerText = "Link do Web App (Google Apps Script)";
-                scriptInput.value = MEU_SCRIPT_PADRAO; 
-                folderContainer.style.display = 'block'; 
-            } else {
-                scriptLabel.innerText = "Link do Web App Exclusivo do Cliente";
-                scriptInput.value = ""; 
-                folderContainer.style.display = 'none'; 
-            }
-        }
-
-        function generateLink() {
-            const title = document.getElementById('event_title').value.trim();
-            const desc = document.getElementById('event_desc').value.trim();
-            const titleColor = document.getElementById('title_color').value;
-            const textColor = document.getElementById('text_color').value;
-            const buttonColor = document.getElementById('button_color').value;
-            
-            const type = document.querySelector('input[name="account_type"]:checked').value;
-            const scriptUrl = document.getElementById('script_url').value.trim();
-            const folderId = document.getElementById('folder_id').value.trim();
-            const sheetId = document.getElementById('sheet_id').value.trim();
-
-            if (!scriptUrl) {
-                alert('Por favor, preencha o Link do Web App.');
-                return;
-            }
-
-            if (type === 'minha' && !folderId) {
-                alert('Por favor, preencha o ID da Pasta do Google Drive.');
-                return;
-            }
-
-            // Monta o link incluindo o parâmetro de cor do botão (&bcol=)
-            let finalUrl = `enviar.html?title=${encodeURIComponent(title)}&desc=${encodeURIComponent(desc)}&tcol=${encodeURIComponent(titleColor)}&col=${encodeURIComponent(textColor)}&bcol=${encodeURIComponent(buttonColor)}&script=${btoa(scriptUrl)}`;
-            
-            if (type === 'minha' && folderId) {
-                finalUrl += `&folder=${btoa(folderId)}`;
-            }
-
-            const linkElement = document.getElementById('final_link');
-            linkElement.href = finalUrl;
-            linkElement.innerText = "Abrir Página do Convidado Personalizada";
-            
-            const resultArea = document.getElementById('result_area');
-            const saveStatus = document.getElementById('save_status');
-            resultArea.style.display = 'block';
-            saveStatus.style.display = 'none';
-
-            // Se o ID da planilha foi preenchido, envia os dados para guardar automaticamente
-            if (sheetId) {
-                saveStatus.style.display = 'block';
-                saveStatus.innerText = "A guardar cliente na planilha Google...";
-
-                const payload = {
-                    action: "save_client",
-                    sheetId: sheetId,
-                    eventName: title,
-                    folderId: folderId || "Exclusivo do Cliente",
-                    eventLink: finalUrl,
-                    buttonColor: buttonColor
-                };
-
-                fetch(scriptUrl, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        saveStatus.innerText = "✓ Cliente guardado com sucesso na planilha!";
-                    } else {
-                        saveStatus.innerText = "Aviso: " + data.message;
-                    }
-                })
-                .catch(err => {
-                    console.error("Erro ao guardar na planilha:", err);
-                    saveStatus.innerText = "Erro ao comunicar com o servidor para guardar na planilha.";
-                });
-            }
-        }
-    </script>
-</body>
-</html>
+            if (type === 'min
