@@ -24,7 +24,7 @@
         .logo-container {
             margin-bottom: 15px;
         }
-.logo-container img {
+        .logo-container img {
             max-width: 120px;
             max-height: 120px;
             object-fit: contain;
@@ -42,8 +42,8 @@
             color: #aaaaaa;
             margin-bottom: 25px;
         }
-:root {
-            --btn-color: #e91e63; /* Cor padrão inicial */
+        :root {
+            --btn-color: #e91e63; /* Cor padrão inicial do botão */
         }
         .btn-upload {
             background-color: var(--btn-color);
@@ -130,6 +130,12 @@
         const desc = getQueryParam('desc') || "Compartilhe suas fotos conosco!";
         const titleColor = getQueryParam('tcol') || "#ffffff";
         const textColor = getQueryParam('col') || "#cccccc";
+        const btnColor = getQueryParam('bcol'); // Cor personalizada do botão enviada pela URL
+
+        // Aplicar a cor personalizada ao botão se ela existir na URL
+        if (btnColor) {
+            document.documentElement.style.setProperty('--btn-color', btnColor);
+        }
         
         const scriptBase64 = getQueryParam('script');
         const folderBase64 = getQueryParam('folder');
@@ -145,7 +151,7 @@
         document.getElementById('event-desc').style.color = textColor;
 
         // ==========================================
-        // LOGOTIPO FIXO (Altere o link abaixo para o seu)
+        // LOGOTIPO FIXO
         // ==========================================
         const FIXED_LOGO_URL = "./logobranca.png";
 
