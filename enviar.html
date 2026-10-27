@@ -42,8 +42,11 @@
             color: #aaaaaa;
             margin-bottom: 25px;
         }
+:root {
+            --btn-color: #e91e63; /* Cor padrão inicial */
+        }
         .btn-upload {
-            background-color: #e91e63;
+            background-color: var(--btn-color);
             color: #ffffff;
             border: none;
             border-radius: 30px;
@@ -52,7 +55,7 @@
             font-weight: bold;
             cursor: pointer;
             width: 100%;
-            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             transition: background 0.2s, transform 0.1s;
             margin-bottom: 15px;
         }
@@ -60,7 +63,7 @@
             transform: scale(0.98);
         }
         .btn-upload:hover {
-            background-color: #d81b60;
+            filter: brightness(0.9);
         }
         .counter {
             font-size: 13px;
